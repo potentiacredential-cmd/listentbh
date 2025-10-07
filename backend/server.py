@@ -110,8 +110,13 @@ class ChatRequest(BaseModel):
     message: str
     user_id: str = "default_user"
 
+class MessageChunk(BaseModel):
+    content: str
+    typing_delay: int  # milliseconds before showing this message
+    pause_after: int   # milliseconds to pause after this message
+
 class ChatResponse(BaseModel):
-    response: str
+    messages: List[MessageChunk]
     crisis_detected: bool = False
     session_complete: bool = False
 
