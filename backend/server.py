@@ -156,6 +156,60 @@ def check_crisis_keywords(text: str) -> bool:
     text_lower = text.lower()
     return any(keyword in text_lower for keyword in SAFETY_KEYWORDS)
 
+def calculate_typing_time(text: str) -> int:
+    """Calculate realistic typing time based on text length"""
+    import random
+    word_count = len(text.split())
+    base_time = word_count * 150  # 150ms per word (average human typing speed)
+    variation = random.randint(-200, 500)  # Add human variability
+    return max(500, base_time + variation)  # Minimum 500ms
+
+def chunk_response_into_messages(response: str) -> List[MessageChunk]:
+    """
+    Break AI response into natural text message chunks.
+    Each chunk should be 1-3 sentences max, feeling like separate text messages.
+    """
+    import random
+    import re
+    
+    # If response is already short (1-2 sentences), return as single message
+    sentences = re.split(r'(?<=[.!?])\s+', response.strip())
+    
+    if len(sentences) <= 2:
+        return [MessageChunk(
+            content=response.strip(),
+            typing_delay=calculate_typing_time(response),
+            pause_after=0
+        )]
+    
+    # Group sentences into natural message chunks
+    chunks = []
+    current_chunk = []
+    
+    for sentence in sentences:
+        current_chunk.append(sentence)
+        
+        # Create new chunk after 2-3 sentences, or if it's a natural break
+        if len(current_chunk) >= 2:
+            chunk_text = ' '.join(current_chunk)
+            chunks.append(MessageChunk(
+                content=chunk_text,
+                typing_delay=calculate_typing_time(chunk_text),
+                pause_after=random.randint(500, 1500)  # Natural pause between messages
+            ))
+            current_chunk = []
+    
+    # Add remaining sentences as final chunk
+    if current_chunk:
+        chunk_text = ' '.join(current_chunk)
+        chunks.append(MessageChunk(
+            content=chunk_text,
+            typing_delay=calculate_typing_time(chunk_text),
+            pause_after=0  # No pause after last message
+        ))
+    
+    return chunks
+
 def extract_emotion_from_conversation(messages: List[ChatMessage]) -> tuple[Optional[str], Optional[int]]:
     """Simple emotion extraction from user messages"""
     # Basic emotion keyword mapping
