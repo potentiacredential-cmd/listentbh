@@ -320,7 +320,10 @@ async def send_message(request: ChatRequest):
         # Get response from Emotional Listener
         response_text = await chat.send_message(user_message)
         
-        # Add assistant message to session
+        # Chunk the response into natural text messages
+        message_chunks = chunk_response_into_messages(response_text)
+        
+        # Add assistant message to session (store full response)
         assistant_msg = ChatMessage(role="assistant", content=response_text)
         session.messages.append(assistant_msg)
         
@@ -330,10 +333,10 @@ async def send_message(request: ChatRequest):
             {"$set": session.dict()}
         )
         
-        logger.info(f"Message exchanged in session: {request.session_id}")
+        logger.info(f"Message exchanged in session: {request.session_id} ({len(message_chunks)} chunks)")
         
         return ChatResponse(
-            response=response_text,
+            messages=message_chunks,
             crisis_detected=crisis_detected,
             session_complete=False
         )
