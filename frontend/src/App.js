@@ -152,20 +152,41 @@ const ChatInterface = () => {
         user_id: "default_user"
       });
       
-      const assistantMsg = {
-        role: 'assistant',
-        content: response.data.response,
-        timestamp: new Date().toISOString()
-      };
+      // Handle chunked messages with realistic timing
+      const messageChunks = response.data.messages || [];
       
-      setMessages(prev => [...prev, assistantMsg]);
+      for (let i = 0; i < messageChunks.length; i++) {
+        const chunk = messageChunks[i];
+        
+        // Show typing indicator
+        setLoading(true);
+        
+        // Wait for typing delay (simulating human typing)
+        await new Promise(resolve => setTimeout(resolve, chunk.typing_delay || 1000));
+        
+        // Add message to chat
+        const assistantMsg = {
+          role: 'assistant',
+          content: chunk.content,
+          timestamp: new Date().toISOString()
+        };
+        
+        setMessages(prev => [...prev, assistantMsg]);
+        
+        // Hide typing indicator
+        setLoading(false);
+        
+        // Pause before next message (if not last message)
+        if (i < messageChunks.length - 1 && chunk.pause_after) {
+          await new Promise(resolve => setTimeout(resolve, chunk.pause_after));
+        }
+      }
       
       if (response.data.crisis_detected) {
         setShowCrisis(true);
       }
     } catch (error) {
       console.error("Error sending message:", error);
-    } finally {
       setLoading(false);
     }
   };
