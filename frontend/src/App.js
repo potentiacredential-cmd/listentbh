@@ -254,7 +254,7 @@ const ChatInterface = () => {
 
 const SessionSummary = () => {
   const navigate = useNavigate();
-  const location = window.location;
+  const location = useLocation();
   const summary = location.state?.summary;
   
   if (!summary) {
