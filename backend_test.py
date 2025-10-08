@@ -345,6 +345,9 @@ def main():
     
     # Chat Flow Tests
     print("\n💬 CHAT FUNCTIONALITY TESTS")
+    tester.test_chat_session_start_unauthenticated()
+    tester.test_chat_message_with_invalid_session()
+    tester.test_chat_message_direct_with_valid_session()
     tester.test_chat_session_start()
     tester.test_chat_message()
     tester.test_crisis_detection()
