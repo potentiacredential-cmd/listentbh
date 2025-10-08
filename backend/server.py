@@ -895,6 +895,159 @@ async def get_memory_processing_sessions(user_id: str = "default_user"):
         logger.error(f"Error fetching processing sessions: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to fetch sessions")
 
+# ============= PATTERN ANALYZER ENDPOINTS =============
+
+@api_router.post("/patterns/analyze")
+async def analyze_patterns(user_id: str = "default_user"):
+    """Run pattern analysis on user's recent sessions"""
+    try:
+        # Get last 14 days of sessions
+        fourteen_days_ago = (datetime.now(timezone.utc) - timedelta(days=14)).isoformat()
+        
+        sessions = await db.sessions.find({
+            "user_id": user_id,
+            "created_at": {"$gte": fourteen_days_ago}
+        }).to_list(100)
+        
+        if not sessions:
+            return {"patterns": [], "message": "Not enough data for analysis"}
+        
+        # Combine all conversation text
+        all_text = ""
+        for session in sessions:
+            session_obj = Session(**session)
+            for msg in session_obj.messages:
+                if msg.role == "user":
+                    all_text += msg.content + " "
+        
+        # Use Pattern Analyzer to identify patterns
+        api_key = os.environ.get('EMERGENT_LLM_KEY')
+        chat = LlmChat(
+            api_key=api_key,
+            session_id=f"pattern_analysis_{user_id}",
+            system_message=PATTERN_ANALYZER_PROMPT
+        ).with_model("anthropic", "claude-4-sonnet-20250514")
+        
+        analysis_prompt = f"Analyze these user conversations for patterns, rumination, and emotional weight:\n\n{all_text}"
+        user_message = UserMessage(text=analysis_prompt)
+        
+        response = await chat.send_message(user_message)
+        
+        # Parse response and store patterns
+        # For now, return raw analysis
+        logger.info(f"Pattern analysis completed for {user_id}")
+        
+        return {"analysis": response, "sessions_analyzed": len(sessions)}
+    
+    except Exception as e:
+        logger.error(f"Error analyzing patterns: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to analyze patterns")
+
+@api_router.get("/patterns/rumination")
+async def check_rumination(user_id: str = "default_user"):
+    """Check if user has rumination patterns that need processing"""
+    try:
+        # Get pattern analyses
+        patterns = await db.pattern_analysis.find({
+            "user_id": user_id,
+            "recommend_processing": True
+        }).sort("rumination_score", -1).to_list(10)
+        
+        return [PatternAnalysis(**pattern) for pattern in patterns]
+    
+    except Exception as e:
+        logger.error(f"Error checking rumination: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to check rumination")
+
+# ============= WEEKLY INSIGHTS ENDPOINTS =============
+
+@api_router.post("/insights/generate")
+async def generate_weekly_insight(user_id: str = "default_user"):
+    """Generate weekly insight report"""
+    try:
+        # Get last 7 days of sessions
+        seven_days_ago = (datetime.now(timezone.utc) - timedelta(days=7)).date().isoformat()
+        today = datetime.now(timezone.utc).date().isoformat()
+        
+        sessions = await db.sessions.find({
+            "user_id": user_id,
+            "date": {"$gte": seven_days_ago}
+        }).to_list(100)
+        
+        if len(sessions) < 2:
+            return {"message": "Need at least 2 check-ins for weekly insights"}
+        
+        # Prepare data for Insight Synthesizer
+        session_summaries = []
+        emotions_list = []
+        
+        for session_doc in sessions:
+            session = Session(**session_doc)
+            if session.primary_emotion:
+                emotions_list.append(session.primary_emotion)
+            if session.summary:
+                session_summaries.append(f"{session.date}: {session.summary}")
+        
+        # Create insight using Insight Synthesizer
+        api_key = os.environ.get('EMERGENT_LLM_KEY')
+        chat = LlmChat(
+            api_key=api_key,
+            session_id=f"weekly_insight_{user_id}",
+            system_message=INSIGHT_SYNTHESIZER_PROMPT
+        ).with_model("anthropic", "claude-4-sonnet-20250514")
+        
+        insight_prompt = f"""Create a weekly insight report for this user.
+
+Check-ins this week: {len(sessions)}
+Emotions experienced: {', '.join(emotions_list)}
+
+Session summaries:
+{chr(10).join(session_summaries)}
+
+Generate a warm, helpful weekly summary."""
+        
+        user_message = UserMessage(text=insight_prompt)
+        response = await chat.send_message(user_message)
+        
+        # Create weekly insight object
+        weekly_insight = WeeklyInsight(
+            user_id=user_id,
+            week_start=seven_days_ago,
+            week_end=today,
+            check_in_count=len(sessions),
+            emotional_weather="mixed",  # Would extract from response
+            frequent_emotions=list(set(emotions_list))[:3],
+            trend="stable",  # Would calculate from data
+            patterns_noticed=[],
+            growth_moments=[],
+            reflection_prompts=[],
+            full_summary=response
+        )
+        
+        # Store insight
+        await db.weekly_insights.insert_one(weekly_insight.dict())
+        
+        logger.info(f"Weekly insight generated for {user_id}")
+        return weekly_insight
+    
+    except Exception as e:
+        logger.error(f"Error generating insight: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to generate insight")
+
+@api_router.get("/insights/recent")
+async def get_recent_insights(user_id: str = "default_user", limit: int = 4):
+    """Get recent weekly insights"""
+    try:
+        insights = await db.weekly_insights.find({
+            "user_id": user_id
+        }).sort("created_at", -1).limit(limit).to_list(limit)
+        
+        return [WeeklyInsight(**insight) for insight in insights]
+    
+    except Exception as e:
+        logger.error(f"Error fetching insights: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to fetch insights")
+
 # Include the router in the main app
 app.include_router(api_router)
 
