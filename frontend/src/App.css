@@ -193,33 +193,35 @@ body {
   color: var(--color-white);
 }
 
-/* ============= CHAT INTERFACE ============= */
+/* ============= CHAT INTERFACE (listentbh Design) ============= */
 .chat-container {
   max-width: 900px;
   margin: 0 auto;
-  padding: 2rem;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background: var(--color-white);
 }
 
 .chat-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
-  padding: 1.5rem;
-  background: rgba(255, 255, 255, 0.6);
+  padding: var(--space-m) var(--space-l);
+  background: var(--color-white);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  position: sticky;
+  top: 0;
+  z-index: 100;
   backdrop-filter: blur(12px);
-  border-radius: 20px;
-  border: 1px solid rgba(139, 92, 246, 0.1);
 }
 
 .chat-header h2 {
-  font-family: 'Crimson Text', serif;
-  font-size: 2rem;
-  color: #334155;
-  font-weight: 600;
+  font-family: -apple-system, 'SF Pro Display', sans-serif;
+  font-size: 34px;
+  color: var(--color-text-black);
+  font-weight: 700;
+  line-height: 1.2;
 }
 
 .messages-container {
