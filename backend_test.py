@@ -83,6 +83,17 @@ class ListentbhAPITester:
             return True
         return False
 
+    def test_chat_session_start_unauthenticated(self):
+        """Test starting a chat session without authentication (should fail)"""
+        success, response = self.run_test(
+            "Start Chat Session (Unauthenticated)",
+            "POST",
+            "chat/session/start",
+            401,
+            data={"user_id": "test_user"}
+        )
+        return success
+
     def test_chat_message(self):
         """Test sending a chat message"""
         if not self.session_id:
