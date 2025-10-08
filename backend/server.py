@@ -661,10 +661,19 @@ async def root():
     return {"message": "listentbh API"}
 
 @api_router.post("/chat/session/start", response_model=SessionStartResponse)
-async def start_session(request: SessionStart):
+async def start_session(
+    request: SessionStart,
+    authorization: Optional[str] = Header(None),
+    session_token: Optional[str] = Cookie(None)
+):
     """Start a new daily check-in session"""
     try:
-        session = Session(user_id=request.user_id)
+        # Get authenticated user
+        user = await get_current_user(authorization, session_token)
+        if not user:
+            raise HTTPException(status_code=401, detail="Not authenticated")
+        
+        session = Session(user_id=user.id)
         
         # Generate varied greeting
         greetings = [
