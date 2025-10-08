@@ -63,19 +63,19 @@ const Landing = () => {
         
         <div className="landing-features">
           <div className="feature-card">
-            <div className="feature-icon">💭</div>
-            <h3>Daily Check-ins</h3>
-            <p>Share your feelings in a judgment-free space</p>
+            <span className="feature-icon">💭</span>
+            <h3>Pour it out</h3>
+            <p>No judgment. No fixing. Just space to let it out.</p>
           </div>
           <div className="feature-card">
-            <div className="feature-icon">🤝</div>
-            <h3>Empathetic Listening</h3>
-            <p>Get validated and heard every single day</p>
+            <span className="feature-icon">🧠</span>
+            <h3>Process it</h3>
+            <p>AI helps you untangle thoughts that feel stuck.</p>
           </div>
           <div className="feature-card">
-            <div className="feature-icon">📊</div>
-            <h3>Track Patterns</h3>
-            <p>Understand your emotional journey over time</p>
+            <span className="feature-icon">🌊</span>
+            <h3>Feel lighter</h3>
+            <p>Watch your mental bandwidth free up in real-time.</p>
           </div>
         </div>
         
