@@ -28,7 +28,11 @@ const AuthHandler = ({ children }) => {
       
       try {
         // Process session with backend
-        const response = await axios.post(`${API}/auth/session-data?session_id=${sessionId}`);
+        const response = await axios.post(`${API}/auth/session-data`, {
+          session_id: sessionId
+        }, {
+          withCredentials: true
+        });
         
         setUser(response.data.user);
         setIsAuthenticated(true);
