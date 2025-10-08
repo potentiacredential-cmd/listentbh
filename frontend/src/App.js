@@ -125,7 +125,9 @@ const ChatInterface = ({ user, logout }) => {
   const startSession = async () => {
     try {
       const response = await axios.post(`${API}/chat/session/start`, {
-        user_id: "default_user"
+        user_id: user?.id || "default_user"
+      }, {
+        withCredentials: true
       });
       setSessionId(response.data.session_id);
       setMessages([{
