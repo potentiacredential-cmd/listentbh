@@ -302,7 +302,7 @@ const ChatInterface = ({ user, logout }) => {
   );
 };
 
-const SessionSummary = () => {
+const SessionSummary = ({ user }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const summary = location.state?.summary;
