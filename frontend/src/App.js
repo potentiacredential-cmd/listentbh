@@ -101,7 +101,7 @@ const Landing = () => {
   );
 };
 
-const ChatInterface = () => {
+const ChatInterface = ({ user, logout }) => {
   const navigate = useNavigate();
   const [sessionId, setSessionId] = useState(null);
   const [messages, setMessages] = useState([]);
