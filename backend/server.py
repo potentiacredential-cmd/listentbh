@@ -1187,6 +1187,8 @@ async def process_session_data(request: SessionDataRequest, response: Response):
     import httpx
     
     try:
+        session_id = request.session_id
+        
         # Call Emergent Auth API
         async with httpx.AsyncClient() as client:
             auth_response = await client.get(
@@ -1203,17 +1205,19 @@ async def process_session_data(request: SessionDataRequest, response: Response):
         existing_user = await db.users.find_one({"email": user_data["email"]})
         
         if not existing_user:
-            # Create new user
-            new_user = User(
-                id=str(uuid.uuid4()),
-                email=user_data["email"],
-                name=user_data["name"],
-                picture=user_data.get("picture")
-            )
-            await db.users.insert_one(new_user.dict(by_alias=True))
-            user_id = new_user.id
+            # Create new user with _id field for MongoDB
+            user_id = str(uuid.uuid4())
+            new_user_doc = {
+                "_id": user_id,
+                "id": user_id,
+                "email": user_data["email"],
+                "name": user_data["name"],
+                "picture": user_data.get("picture"),
+                "created_at": datetime.now(timezone.utc).isoformat()
+            }
+            await db.users.insert_one(new_user_doc)
         else:
-            user_id = existing_user["id"]
+            user_id = existing_user.get("id") or existing_user.get("_id")
         
         # Create session
         session_token = user_data["session_token"]
