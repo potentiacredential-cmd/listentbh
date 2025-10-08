@@ -116,6 +116,9 @@ backend:
         - working: false
         - agent: "main"
         - comment: "User reports send button not working after login. Backend endpoint exists at /api/chat/message with proper ChatRequest/ChatResponse models. Services are running, EMERGENT_LLM_KEY is configured. Need to test if backend endpoint is accessible and functional."
+        - working: true
+        - agent: "main"
+        - comment: "FIXED: Root cause identified by testing agent - /api/chat/session/start was throwing 500 error instead of proper 401. Fixed error handling to properly re-raise HTTPException (401) without converting to 500. Backend restarted with fix applied."
 
 frontend:
   - task: "Chat Interface send button functionality"
