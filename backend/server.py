@@ -1182,7 +1182,7 @@ async def get_current_user(authorization: Optional[str] = None, session_token_co
     return User(**user_doc)
 
 @api_router.post("/auth/session-data")
-async def process_session_data(session_id: str, response: Response):
+async def process_session_data(request: SessionDataRequest, response: Response):
     """Process session_id from Emergent Auth and create session"""
     import httpx
     
