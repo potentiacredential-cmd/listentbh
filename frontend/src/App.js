@@ -498,7 +498,7 @@ const EmotionHistory = ({ user }) => {
   );
 };
 
-const MemoryProcessing = () => {
+const MemoryProcessing = ({ user }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const topic = location.state?.topic || "this issue";
