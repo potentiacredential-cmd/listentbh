@@ -384,8 +384,12 @@ const EmotionHistory = ({ user }) => {
   const fetchHistory = async () => {
     try {
       const [emotionsRes, sessionsRes] = await Promise.all([
-        axios.get(`${API}/emotions/history?user_id=default_user&days=14`),
-        axios.get(`${API}/sessions/recent?user_id=default_user&limit=7`)
+        axios.get(`${API}/emotions/history?user_id=${user?.id || 'default_user'}&days=14`, {
+          withCredentials: true
+        }),
+        axios.get(`${API}/sessions/recent?user_id=${user?.id || 'default_user'}&limit=7`, {
+          withCredentials: true
+        })
       ]);
       
       setEmotions(emotionsRes.data);
