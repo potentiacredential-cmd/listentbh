@@ -1,12 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 import "@/App.css";
-import { BrowserRouter, Routes, Route, useNavigate, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useNavigate, useLocation, Navigate } from "react-router-dom";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, LogOut } from "lucide-react";
 import MemoryProcessingInterface from "@/components/MemoryProcessing";
+import AuthHandler from "@/components/AuthHandler";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
