@@ -448,6 +448,9 @@ def main():
     print("\n🔐 AUTHENTICATION TESTS")
     tester.test_auth_endpoints()
     
+    # Comprehensive Chat Flow Diagnosis
+    tester.test_chat_flow_diagnosis()
+    
     # Final Results
     print("\n" + "=" * 50)
     print(f"📊 FINAL RESULTS")
