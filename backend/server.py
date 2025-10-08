@@ -199,6 +199,61 @@ class Session(BaseModel):
     completed: bool = False
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
+class MemoryProcessingSession(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    memory_topic: str
+    phase: str = "externalize"  # externalize, reframe, distance, release
+    messages: List[ChatMessage] = []
+    
+    # Externalize data
+    externalize_complete: bool = False
+    physical_symptoms: List[str] = []
+    word_count: int = 0
+    
+    # Reframe data
+    techniques_used: List[str] = []
+    old_narrative: Optional[str] = None
+    new_narrative: Optional[str] = None
+    narrative_accepted: bool = False
+    
+    # Distance data
+    distance_techniques: List[str] = []
+    temporal_achieved: bool = False
+    identity_separation: bool = False
+    size_before: Optional[str] = None
+    size_after: Optional[str] = None
+    
+    # Release data
+    ritual_chosen: Optional[str] = None
+    ritual_completed: bool = False
+    behavioral_commitment: Optional[str] = None
+    archival_choice: Optional[str] = None
+    
+    # Outcome tracking
+    weight_before: Optional[str] = None
+    weight_after: Optional[str] = None
+    relief_achieved: bool = False
+    closure_achieved: bool = False
+    processing_effectiveness: Optional[float] = None
+    
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    completed_at: Optional[str] = None
+
+class StartMemoryProcessingRequest(BaseModel):
+    user_id: str = "default_user"
+    memory_topic: str
+
+class MemoryProcessingMessageRequest(BaseModel):
+    session_id: str
+    message: str
+    user_id: str = "default_user"
+
+class UpdateProcessingPhaseRequest(BaseModel):
+    session_id: str
+    phase_data: dict
+    user_id: str = "default_user"
+
 # ============= HELPER FUNCTIONS =============
 
 def check_crisis_keywords(text: str) -> bool:
