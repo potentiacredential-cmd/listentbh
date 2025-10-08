@@ -3,6 +3,7 @@ import sys
 import json
 from datetime import datetime
 import time
+import uuid
 
 class ListentbhAPITester:
     def __init__(self, base_url="https://mindlistener.preview.emergentagent.com"):
