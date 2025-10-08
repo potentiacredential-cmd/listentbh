@@ -1093,6 +1093,95 @@ body {
   100% { transform: translate(-50%, -50%) scale(1); }
 }
 
+/* ============= AUTHENTICATION ============= */
+.google-login-button {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: white;
+  color: #333;
+  font-size: 1.125rem;
+  padding: 1.25rem 2.5rem;
+  border-radius: 16px;
+  border: 2px solid #E0E0E0;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  margin: 0.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.google-login-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  border-color: #8B5CF6;
+}
+
+.google-icon {
+  flex-shrink: 0;
+}
+
+.privacy-note {
+  color: #64748B;
+  font-size: 0.875rem;
+  margin-top: 1.5rem;
+}
+
+.auth-loading {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(139, 92, 246, 0.1);
+  border-top-color: #8B5CF6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 12px;
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.user-name {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #334155;
+}
+
+.chat-header-left {
+  display: flex;
+  align-items: center;
+}
+
+.chat-header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
 /* ============= RESPONSIVE ============= */
 @media (max-width: 768px) {
   .landing-title {
