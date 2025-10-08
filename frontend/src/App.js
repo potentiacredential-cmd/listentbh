@@ -217,14 +217,31 @@ const ChatInterface = ({ user, logout }) => {
       <CrisisModal show={showCrisis} onClose={() => setShowCrisis(false)} />
       
       <div className="chat-header">
-        <h2 data-testid="chat-title">Your Daily Check-in</h2>
-        <Button 
-          variant="outline" 
-          onClick={endSession}
-          data-testid="end-session-button"
-        >
-          End Session
-        </Button>
+        <div className="chat-header-left">
+          <h2 data-testid="chat-title">Your Daily Check-in</h2>
+        </div>
+        <div className="chat-header-right">
+          {user && (
+            <div className="user-profile">
+              {user.picture && <img src={user.picture} alt={user.name} className="user-avatar" />}
+              <span className="user-name">{user.name}</span>
+            </div>
+          )}
+          <Button 
+            variant="outline" 
+            onClick={endSession}
+            data-testid="end-session-button"
+          >
+            End Session
+          </Button>
+          <Button 
+            variant="ghost" 
+            onClick={logout}
+            data-testid="logout-button"
+          >
+            <LogOut size={20} />
+          </Button>
+        </div>
       </div>
       
       <div className="messages-container" data-testid="messages-container">
