@@ -157,7 +157,9 @@ const ChatInterface = ({ user, logout }) => {
       const response = await axios.post(`${API}/chat/message`, {
         session_id: sessionId,
         message: inputMessage,
-        user_id: "default_user"
+        user_id: user?.id || "default_user"
+      }, {
+        withCredentials: true
       });
       
       // Handle chunked messages with realistic timing
