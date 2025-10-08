@@ -413,6 +413,36 @@ class UpdateProcessingPhaseRequest(BaseModel):
     phase_data: dict
     user_id: str = "default_user"
 
+class PatternAnalysis(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    topic: str
+    mention_count: int = 1
+    weight: str = "moderate"  # heavy, moderate, light
+    rumination_score: int = 0
+    relief_detected: bool = False
+    recommend_processing: bool = False
+    patterns: List[str] = []
+    mental_bandwidth: str = "normal"
+    first_mention: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    last_mention: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+class WeeklyInsight(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    week_start: str
+    week_end: str
+    check_in_count: int
+    emotional_weather: str
+    frequent_emotions: List[str]
+    trend: str  # improving, stable, declining
+    patterns_noticed: List[str]
+    growth_moments: List[str]
+    reflection_prompts: List[str]
+    full_summary: str
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
 # ============= HELPER FUNCTIONS =============
 
 def check_crisis_keywords(text: str) -> bool:
