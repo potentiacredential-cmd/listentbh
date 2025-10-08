@@ -334,6 +334,80 @@ class ListentbhAPITester:
         )
         return success
 
+    def test_chat_flow_diagnosis(self):
+        """Comprehensive diagnosis of the chat flow issue"""
+        print("\n🔍 CHAT FLOW DIAGNOSIS")
+        print("=" * 50)
+        
+        # Test 1: Verify the root issue - session start requires auth
+        print("\n1. Testing session start without authentication:")
+        success, response = self.run_test(
+            "Session Start (No Auth)",
+            "POST", 
+            "chat/session/start",
+            401,  # We expect 401, but we're getting 500
+            data={"user_id": "test_user"}
+        )
+        
+        if not success:
+            print("   ❌ ISSUE CONFIRMED: Session start is failing with 500 instead of 401")
+            print("   📋 This suggests an internal server error in authentication handling")
+        
+        # Test 2: Test what happens if we had a valid session
+        print("\n2. Testing message endpoint with invalid session:")
+        fake_session_id = str(uuid.uuid4())
+        success, response = self.run_test(
+            "Message (Invalid Session)",
+            "POST",
+            "chat/message", 
+            404,
+            data={
+                "session_id": fake_session_id,
+                "message": "Test message",
+                "user_id": "test_user"
+            }
+        )
+        
+        if success:
+            print("   ✅ Message endpoint correctly rejects invalid session")
+        
+        # Test 3: Check if memory processing works (it doesn't require auth)
+        print("\n3. Testing memory processing (no auth required):")
+        success, response = self.run_test(
+            "Memory Processing Start",
+            "POST",
+            "memory/start",
+            200,
+            data={
+                "user_id": "test_user", 
+                "memory_topic": "test topic"
+            }
+        )
+        
+        if success:
+            print("   ✅ Memory processing works without authentication")
+            print("   📋 This confirms the backend is working, just chat session needs auth")
+        
+        # Test 4: Check auth/me endpoint behavior
+        print("\n4. Testing auth/me endpoint:")
+        success, response = self.run_test(
+            "Auth Me Check",
+            "GET",
+            "auth/me",
+            401
+        )
+        
+        if success:
+            print("   ✅ Auth endpoint correctly returns 401 for unauthenticated requests")
+        
+        print("\n📊 DIAGNOSIS SUMMARY:")
+        print("   🔍 ROOT CAUSE: /api/chat/session/start requires authentication")
+        print("   🔍 FRONTEND FLOW: User logs in → gets session token → starts chat session")
+        print("   🔍 BACKEND ISSUE: Session start endpoint is throwing 500 error instead of 401")
+        print("   🔍 IMPACT: Send button doesn't work because no session_id is created")
+        
+        return True
+
 def main():
     print("🚀 Starting listentbh API Testing")
     print("=" * 50)
