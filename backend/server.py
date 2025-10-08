@@ -530,6 +530,26 @@ class WeeklyInsight(BaseModel):
     full_summary: str
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
+class User(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()), alias="_id")
+    email: str
+    name: str
+    picture: Optional[str] = None
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    
+    class Config:
+        populate_by_name = True
+
+class UserSession(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    session_token: str
+    expires_at: str
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+class SessionDataRequest(BaseModel):
+    session_id: str
+
 # ============= HELPER FUNCTIONS =============
 
 def check_crisis_keywords(text: str) -> bool:
