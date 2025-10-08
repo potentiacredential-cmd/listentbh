@@ -1155,6 +1155,133 @@ async def get_recent_insights(user_id: str = "default_user", limit: int = 4):
         logger.error(f"Error fetching insights: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to fetch insights")
 
+# ============= AUTHENTICATION ENDPOINTS =============
+
+async def get_current_user(authorization: Optional[str] = None, session_token_cookie: Optional[str] = None):
+    """Get current user from session token (cookie or header)"""
+    # Try cookie first, then Authorization header
+    session_token = session_token_cookie or (authorization.replace("Bearer ", "") if authorization else None)
+    
+    if not session_token:
+        return None
+    
+    # Find session
+    session_doc = await db.user_sessions.find_one({
+        "session_token": session_token,
+        "expires_at": {"$gt": datetime.now(timezone.utc).isoformat()}
+    })
+    
+    if not session_doc:
+        return None
+    
+    # Find user
+    user_doc = await db.users.find_one({"id": session_doc["user_id"]})
+    if not user_doc:
+        return None
+    
+    return User(**user_doc)
+
+@api_router.post("/auth/session-data")
+async def process_session_data(session_id: str, response: Response):
+    """Process session_id from Emergent Auth and create session"""
+    import httpx
+    
+    try:
+        # Call Emergent Auth API
+        async with httpx.AsyncClient() as client:
+            auth_response = await client.get(
+                "https://demobackend.emergentagent.com/auth/v1/env/oauth/session-data",
+                headers={"X-Session-ID": session_id}
+            )
+            
+            if auth_response.status_code != 200:
+                raise HTTPException(status_code=401, detail="Invalid session")
+            
+            user_data = auth_response.json()
+        
+        # Check if user exists
+        existing_user = await db.users.find_one({"email": user_data["email"]})
+        
+        if not existing_user:
+            # Create new user
+            new_user = User(
+                id=str(uuid.uuid4()),
+                email=user_data["email"],
+                name=user_data["name"],
+                picture=user_data.get("picture")
+            )
+            await db.users.insert_one(new_user.dict(by_alias=True))
+            user_id = new_user.id
+        else:
+            user_id = existing_user["id"]
+        
+        # Create session
+        session_token = user_data["session_token"]
+        expires_at = (datetime.now(timezone.utc) + timedelta(days=7)).isoformat()
+        
+        new_session = UserSession(
+            user_id=user_id,
+            session_token=session_token,
+            expires_at=expires_at
+        )
+        
+        await db.user_sessions.insert_one(new_session.dict())
+        
+        # Set cookie
+        response.set_cookie(
+            key="session_token",
+            value=session_token,
+            httponly=True,
+            secure=True,
+            samesite="none",
+            path="/",
+            max_age=7 * 24 * 60 * 60
+        )
+        
+        return {
+            "user": {
+                "id": user_id,
+                "email": user_data["email"],
+                "name": user_data["name"],
+                "picture": user_data.get("picture")
+            }
+        }
+    
+    except Exception as e:
+        logger.error(f"Error processing session: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to process session")
+
+@api_router.get("/auth/me")
+async def get_current_user_info(
+    authorization: Optional[str] = Header(None),
+    session_token: Optional[str] = Cookie(None)
+):
+    """Get current authenticated user"""
+    user = await get_current_user(authorization, session_token)
+    
+    if not user:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    return user
+
+@api_router.post("/auth/logout")
+async def logout(
+    response: Response,
+    authorization: Optional[str] = Header(None),
+    session_token: Optional[str] = Cookie(None)
+):
+    """Logout user"""
+    token = session_token or (authorization.replace("Bearer ", "") if authorization else None)
+    
+    if token:
+        # Delete session from database
+        await db.user_sessions.delete_one({"session_token": token})
+    
+    # Clear cookie
+    response.delete_cookie(key="session_token", path="/")
+    
+    return {"message": "Logged out successfully"}
+
 # Include the router in the main app
 app.include_router(api_router)
 
