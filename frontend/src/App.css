@@ -15,48 +15,95 @@ body {
   color: #1D1D1F;
 }
 
+:root {
+  /* listentbh Color System */
+  --color-mind-blue: #007AFF;
+  --color-calm-purple: #5856D6;
+  --color-safe-green: #34C759;
+  --color-white: #FFFFFF;
+  --color-soft-gray: #F5F5F7;
+  --color-text-black: #1D1D1F;
+  --color-subtle-gray: #8E8E93;
+  --color-heavy: rgba(255, 59, 48, 0.1);
+  --color-moderate: rgba(255, 149, 0, 0.1);
+  --color-light: rgba(52, 199, 89, 0.1);
+  
+  /* Spacing Scale */
+  --space-xs: 4px;
+  --space-s: 8px;
+  --space-m: 16px;
+  --space-l: 24px;
+  --space-xl: 32px;
+  --space-xxl: 48px;
+  
+  /* Animation Timing */
+  --timing-micro: 200ms;
+  --timing-short: 300ms;
+  --timing-medium: 500ms;
+  --timing-long: 800ms;
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --ease-gentle: cubic-bezier(0.4, 0, 0.6, 1);
+}
+
 .App {
   min-height: 100vh;
 }
 
-/* ============= LANDING PAGE ============= */
+/* ============= LANDING PAGE (listentbh Design) ============= */
 .landing-container {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
-  background: linear-gradient(135deg, #FAF5FF 0%, #FFF0F5 50%, #F0F9FF 100%);
+  padding: var(--space-xxl) var(--space-l);
+  background: linear-gradient(135deg, #FAFAFA 0%, #F5F5F7 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.landing-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 30%, rgba(0, 122, 255, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(88, 86, 214, 0.05) 0%, transparent 50%);
+  pointer-events: none;
 }
 
 .landing-content {
   max-width: 1000px;
   width: 100%;
   text-align: center;
+  position: relative;
+  z-index: 1;
 }
 
 .landing-header {
-  margin-bottom: 4rem;
+  margin-bottom: var(--space-xxl);
 }
 
 .landing-title {
-  font-family: 'Crimson Text', serif;
-  font-size: 4rem;
+  font-family: -apple-system, 'SF Pro Display', sans-serif;
+  font-size: 72px;
   font-weight: 700;
-  background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin-bottom: 1rem;
+  color: var(--color-text-black);
+  margin-bottom: var(--space-m);
   line-height: 1.2;
+  letter-spacing: -0.02em;
 }
 
 .landing-subtitle {
-  font-size: 1.5rem;
-  color: #64748B;
-  font-weight: 300;
+  font-size: 24px;
+  color: var(--color-subtle-gray);
+  font-weight: 400;
   max-width: 600px;
   margin: 0 auto;
+  line-height: 1.4;
 }
 
 .landing-features {
