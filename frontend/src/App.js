@@ -57,8 +57,8 @@ const Landing = () => {
     <div className="landing-container">
       <div className="landing-content">
         <div className="landing-header">
-          <h1 className="landing-title">Daily Mood Compass</h1>
-          <p className="landing-subtitle">A safe space to process your emotions, one day at a time</p>
+          <h1 className="landing-title">listentbh</h1>
+          <p className="landing-subtitle">Transform heavy thoughts into light moments</p>
         </div>
         
         <div className="landing-features">
