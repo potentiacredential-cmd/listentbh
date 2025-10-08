@@ -371,7 +371,7 @@ const SessionSummary = () => {
   );
 };
 
-const EmotionHistory = () => {
+const EmotionHistory = ({ user }) => {
   const navigate = useNavigate();
   const [emotions, setEmotions] = useState([]);
   const [sessions, setSessions] = useState([]);
