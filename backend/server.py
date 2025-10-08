@@ -692,6 +692,9 @@ async def start_session(
         logger.info(f"Started new session: {session.id}")
         return SessionStartResponse(session_id=session.id, greeting=greeting)
     
+    except HTTPException:
+        # Re-raise HTTP exceptions (like 401) without converting to 500
+        raise
     except Exception as e:
         logger.error(f"Error starting session: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to start session")
