@@ -218,7 +218,7 @@ const ChatInterface = ({ user, logout }) => {
       
       <div className="chat-header">
         <div className="chat-header-left">
-          <h2 data-testid="chat-title">Your Daily Check-in</h2>
+          <h2 data-testid="chat-title">listentbh</h2>
         </div>
         <div className="chat-header-right">
           {user && (
