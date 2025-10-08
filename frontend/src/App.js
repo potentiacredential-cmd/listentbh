@@ -466,6 +466,19 @@ const EmotionHistory = () => {
   );
 };
 
+const MemoryProcessing = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const topic = location.state?.topic || "this issue";
+  
+  return (
+    <MemoryProcessingInterface 
+      topic={topic} 
+      onClose={() => navigate('/chat')} 
+    />
+  );
+};
+
 function App() {
   return (
     <div className="App">
@@ -475,6 +488,7 @@ function App() {
           <Route path="/chat" element={<ChatInterface />} />
           <Route path="/summary" element={<SessionSummary />} />
           <Route path="/history" element={<EmotionHistory />} />
+          <Route path="/memory-processing" element={<MemoryProcessing />} />
         </Routes>
       </BrowserRouter>
     </div>
