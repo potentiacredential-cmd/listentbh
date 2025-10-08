@@ -526,6 +526,186 @@ async def get_recent_sessions(user_id: str = "default_user", limit: int = 7):
         logger.error(f"Error fetching recent sessions: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to fetch sessions")
 
+# ============= MEMORY PROCESSING ENDPOINTS =============
+
+@api_router.post("/memory/start")
+async def start_memory_processing(request: StartMemoryProcessingRequest):
+    """Start a memory processing session"""
+    try:
+        processing_session = MemoryProcessingSession(
+            user_id=request.user_id,
+            memory_topic=request.memory_topic
+        )
+        
+        # Save to DB
+        await db.memory_processing.insert_one(processing_session.dict())
+        
+        # Initialize Memory Processing Guide chat
+        api_key = os.environ.get('EMERGENT_LLM_KEY')
+        chat = LlmChat(
+            api_key=api_key,
+            session_id=processing_session.id,
+            system_message=MEMORY_PROCESSING_GUIDE_PROMPT
+        ).with_model("anthropic", "claude-4-sonnet-20250514")
+        
+        # Get opening message
+        opening_prompt = f"User has mentioned '{request.memory_topic}' multiple times and it's weighing on them. Start the memory processing flow with the opening sequence."
+        
+        user_message = UserMessage(text=opening_prompt)
+        response_text = await chat.send_message(user_message)
+        
+        # Chunk response
+        message_chunks = chunk_response_into_messages(response_text)
+        
+        # Store opening messages
+        opening_msg = ChatMessage(role="assistant", content=response_text)
+        processing_session.messages.append(opening_msg)
+        
+        await db.memory_processing.update_one(
+            {"id": processing_session.id},
+            {"$set": processing_session.dict()}
+        )
+        
+        logger.info(f"Started memory processing: {processing_session.id}")
+        
+        return {
+            "session_id": processing_session.id,
+            "messages": message_chunks,
+            "phase": "externalize"
+        }
+    
+    except Exception as e:
+        logger.error(f"Error starting memory processing: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to start processing: {str(e)}")
+
+@api_router.post("/memory/message")
+async def send_memory_processing_message(request: MemoryProcessingMessageRequest):
+    """Send a message during memory processing"""
+    try:
+        # Get processing session from DB
+        session_doc = await db.memory_processing.find_one({"id": request.session_id})
+        if not session_doc:
+            raise HTTPException(status_code=404, detail="Processing session not found")
+        
+        processing_session = MemoryProcessingSession(**session_doc)
+        
+        # Add user message
+        user_msg = ChatMessage(role="user", content=request.message)
+        processing_session.messages.append(user_msg)
+        
+        # Get response from Memory Processing Guide
+        api_key = os.environ.get('EMERGENT_LLM_KEY')
+        chat = LlmChat(
+            api_key=api_key,
+            session_id=request.session_id,
+            system_message=MEMORY_PROCESSING_GUIDE_PROMPT
+        ).with_model("anthropic", "claude-4-sonnet-20250514")
+        
+        user_message = UserMessage(text=request.message)
+        response_text = await chat.send_message(user_message)
+        
+        # Chunk response
+        message_chunks = chunk_response_into_messages(response_text)
+        
+        # Store response
+        assistant_msg = ChatMessage(role="assistant", content=response_text)
+        processing_session.messages.append(assistant_msg)
+        
+        # Detect phase transitions and extract data
+        if processing_session.phase == "externalize":
+            # Check for completion phrases
+            if any(phrase in response_text.lower() for phrase in ["is there anything else", "take a breath", "where do you feel"]):
+                processing_session.externalize_complete = True
+                processing_session.word_count = sum(len(msg.content.split()) for msg in processing_session.messages if msg.role == "user")
+        
+        elif processing_session.phase == "reframe":
+            # Extract narratives if present
+            if "old story" in response_text.lower() and "new story" in response_text.lower():
+                processing_session.narrative_accepted = True
+        
+        # Update session
+        await db.memory_processing.update_one(
+            {"id": request.session_id},
+            {"$set": processing_session.dict()}
+        )
+        
+        logger.info(f"Memory processing message exchanged: {request.session_id}")
+        
+        return {
+            "messages": message_chunks,
+            "phase": processing_session.phase,
+            "phase_complete": processing_session.externalize_complete if processing_session.phase == "externalize" else False
+        }
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error in memory processing: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to process message: {str(e)}")
+
+@api_router.post("/memory/update-phase")
+async def update_memory_processing_phase(request: UpdateProcessingPhaseRequest):
+    """Update phase data during memory processing"""
+    try:
+        session_doc = await db.memory_processing.find_one({"id": request.session_id})
+        if not session_doc:
+            raise HTTPException(status_code=404, detail="Processing session not found")
+        
+        processing_session = MemoryProcessingSession(**session_doc)
+        
+        # Update based on phase
+        phase_data = request.phase_data
+        
+        if "phase" in phase_data:
+            processing_session.phase = phase_data["phase"]
+        
+        if "old_narrative" in phase_data:
+            processing_session.old_narrative = phase_data["old_narrative"]
+        
+        if "new_narrative" in phase_data:
+            processing_session.new_narrative = phase_data["new_narrative"]
+        
+        if "ritual_chosen" in phase_data:
+            processing_session.ritual_chosen = phase_data["ritual_chosen"]
+            
+        if "ritual_completed" in phase_data:
+            processing_session.ritual_completed = phase_data["ritual_completed"]
+        
+        if "behavioral_commitment" in phase_data:
+            processing_session.behavioral_commitment = phase_data["behavioral_commitment"]
+        
+        if "closure_achieved" in phase_data:
+            processing_session.closure_achieved = phase_data["closure_achieved"]
+            processing_session.completed_at = datetime.now(timezone.utc).isoformat()
+        
+        # Update session
+        await db.memory_processing.update_one(
+            {"id": request.session_id},
+            {"$set": processing_session.dict()}
+        )
+        
+        return {"success": True, "phase": processing_session.phase}
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error updating phase: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to update phase")
+
+@api_router.get("/memory/sessions")
+async def get_memory_processing_sessions(user_id: str = "default_user"):
+    """Get user's memory processing sessions"""
+    try:
+        sessions = await db.memory_processing.find(
+            {"user_id": user_id}
+        ).sort("created_at", -1).to_list(50)
+        
+        return [MemoryProcessingSession(**session) for session in sessions]
+    
+    except Exception as e:
+        logger.error(f"Error fetching processing sessions: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to fetch sessions")
+
 # Include the router in the main app
 app.include_router(api_router)
 
