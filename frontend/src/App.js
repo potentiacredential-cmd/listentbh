@@ -484,17 +484,62 @@ const MemoryProcessing = () => {
   );
 };
 
+const ProtectedRoute = ({ children, isAuthenticated }) => {
+  return isAuthenticated ? children : <Navigate to="/" replace />;
+};
+
 function App() {
   return (
     <div className="App">
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Landing />} />
-          <Route path="/chat" element={<ChatInterface />} />
-          <Route path="/summary" element={<SessionSummary />} />
-          <Route path="/history" element={<EmotionHistory />} />
-          <Route path="/memory-processing" element={<MemoryProcessing />} />
-        </Routes>
+        <AuthHandler>
+          {({ isAuthenticated, user, logout }) => (
+            <Routes>
+              <Route 
+                path="/" 
+                element={
+                  isAuthenticated ? (
+                    <Navigate to="/chat" replace />
+                  ) : (
+                    <Landing />
+                  )
+                } 
+              />
+              <Route 
+                path="/chat" 
+                element={
+                  <ProtectedRoute isAuthenticated={isAuthenticated}>
+                    <ChatInterface user={user} logout={logout} />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/summary" 
+                element={
+                  <ProtectedRoute isAuthenticated={isAuthenticated}>
+                    <SessionSummary user={user} logout={logout} />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/history" 
+                element={
+                  <ProtectedRoute isAuthenticated={isAuthenticated}>
+                    <EmotionHistory user={user} logout={logout} />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/memory-processing" 
+                element={
+                  <ProtectedRoute isAuthenticated={isAuthenticated}>
+                    <MemoryProcessing user={user} logout={logout} />
+                  </ProtectedRoute>
+                } 
+              />
+            </Routes>
+          )}
+        </AuthHandler>
       </BrowserRouter>
     </div>
   );
