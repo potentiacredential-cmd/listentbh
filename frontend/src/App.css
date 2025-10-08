@@ -1165,28 +1165,31 @@ body {
   100% { transform: translate(-50%, -50%) scale(1); }
 }
 
-/* ============= AUTHENTICATION ============= */
+/* ============= AUTHENTICATION (listentbh Design) ============= */
 .google-login-button {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  background: white;
-  color: #333;
-  font-size: 1.125rem;
-  padding: 1.25rem 2.5rem;
-  border-radius: 16px;
-  border: 2px solid #E0E0E0;
+  justify-content: center;
+  gap: 12px;
+  background: var(--color-white);
+  color: var(--color-text-black);
+  font-size: 17px;
+  font-weight: 600;
+  padding: 18px 40px;
+  border-radius: 14px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
   cursor: pointer;
-  font-weight: 500;
-  transition: all 0.2s ease;
-  margin: 0.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform var(--timing-micro) var(--ease-smooth),
+              box-shadow var(--timing-micro) var(--ease-smooth),
+              border-color var(--timing-micro) var(--ease-smooth);
+  margin: var(--space-s);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .google-login-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-  border-color: #8B5CF6;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  border-color: var(--color-mind-blue);
 }
 
 .google-icon {
@@ -1194,9 +1197,10 @@ body {
 }
 
 .privacy-note {
-  color: #64748B;
-  font-size: 0.875rem;
-  margin-top: 1.5rem;
+  color: var(--color-subtle-gray);
+  font-size: 15px;
+  margin-top: var(--space-l);
+  line-height: 1.5;
 }
 
 .auth-loading {
