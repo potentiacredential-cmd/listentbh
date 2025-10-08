@@ -207,7 +207,9 @@ const ChatInterface = ({ user, logout }) => {
     try {
       const response = await axios.post(`${API}/chat/session/complete`, {
         session_id: sessionId,
-        user_id: "default_user"
+        user_id: user?.id || "default_user"
+      }, {
+        withCredentials: true
       });
       
       navigate('/summary', { state: { summary: response.data } });
