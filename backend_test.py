@@ -5,7 +5,7 @@ from datetime import datetime
 import time
 
 class ListentbhAPITester:
-    def __init__(self, base_url="https://mood-compass-4.preview.emergentagent.com"):
+    def __init__(self, base_url="https://mindlistener.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.session_token = None
