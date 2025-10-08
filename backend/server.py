@@ -658,7 +658,7 @@ async def generate_session_summary(messages: List[ChatMessage], session_id: str)
 
 @api_router.get("/")
 async def root():
-    return {"message": "Daily Mood Compass API"}
+    return {"message": "listentbh API"}
 
 @api_router.post("/chat/session/start", response_model=SessionStartResponse)
 async def start_session(request: SessionStart):
