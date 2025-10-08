@@ -109,75 +109,88 @@ body {
 .landing-features {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 2rem;
-  margin-bottom: 3rem;
+  gap: var(--space-l);
+  margin-bottom: var(--space-xxl);
 }
 
 .feature-card {
-  background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(12px);
-  border-radius: 24px;
-  padding: 2.5rem;
-  border: 1px solid rgba(139, 92, 246, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background: var(--color-white);
+  border-radius: 20px;
+  padding: var(--space-xl);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  transition: transform var(--timing-short) var(--ease-smooth), 
+              box-shadow var(--timing-short) var(--ease-smooth);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .feature-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 20px 40px rgba(139, 92, 246, 0.15);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
 }
 
 .feature-icon {
-  font-size: 3rem;
-  margin-bottom: 1rem;
+  font-size: 48px;
+  margin-bottom: var(--space-m);
+  display: block;
 }
 
 .feature-card h3 {
-  font-family: 'Crimson Text', serif;
-  font-size: 1.5rem;
-  color: #334155;
-  margin-bottom: 0.5rem;
+  font-family: -apple-system, 'SF Pro Display', sans-serif;
+  font-size: 28px;
+  color: var(--color-text-black);
+  margin-bottom: var(--space-s);
   font-weight: 600;
+  line-height: 1.2;
 }
 
 .feature-card p {
-  color: #64748B;
-  font-size: 1rem;
-  line-height: 1.6;
+  color: var(--color-subtle-gray);
+  font-size: 17px;
+  line-height: 1.5;
 }
 
 .cta-button {
-  background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
-  color: white;
-  font-size: 1.125rem;
-  padding: 1.5rem 3rem;
-  border-radius: 16px;
+  background: linear-gradient(135deg, var(--color-mind-blue) 0%, var(--color-calm-purple) 100%);
+  color: var(--color-white);
+  font-size: 17px;
+  font-weight: 600;
+  padding: 18px 40px;
+  border-radius: 14px;
   border: none;
   cursor: pointer;
-  font-weight: 500;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  margin: 0.5rem;
+  transition: transform var(--timing-micro) var(--ease-smooth), 
+              box-shadow var(--timing-micro) var(--ease-smooth);
+  margin: var(--space-s);
+  box-shadow: 0 4px 16px rgba(0, 122, 255, 0.3);
+  animation: subtleBounce 2s infinite;
+}
+
+@keyframes subtleBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
 }
 
 .cta-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 24px rgba(139, 92, 246, 0.3);
+  box-shadow: 0 8px 24px rgba(0, 122, 255, 0.4);
 }
 
 .secondary-button {
-  font-size: 1.125rem;
-  padding: 1.5rem 3rem;
-  border-radius: 16px;
-  margin: 0.5rem;
-  border: 2px solid #8B5CF6;
+  font-size: 17px;
+  font-weight: 600;
+  padding: 18px 40px;
+  border-radius: 14px;
+  margin: var(--space-s);
+  border: 2px solid var(--color-mind-blue);
   background: transparent;
-  color: #8B5CF6;
-  transition: background 0.2s ease, color 0.2s ease;
+  color: var(--color-mind-blue);
+  transition: background var(--timing-micro) var(--ease-smooth), 
+              color var(--timing-micro) var(--ease-smooth);
 }
 
 .secondary-button:hover {
-  background: #8B5CF6;
-  color: white;
+  background: var(--color-mind-blue);
+  color: var(--color-white);
 }
 
 /* ============= CHAT INTERFACE ============= */
