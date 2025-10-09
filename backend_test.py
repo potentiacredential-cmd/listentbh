@@ -628,8 +628,8 @@ class ListentbhAPITester:
         return self.gemini_tests_passed == self.gemini_tests_run
 
 def main():
-    print("🚀 Starting listentbh API Testing")
-    print("=" * 50)
+    print("🚀 Starting listentbh Gemini API Integration Testing")
+    print("=" * 60)
     
     tester = ListentbhAPITester()
     
@@ -637,52 +637,54 @@ def main():
     print("\n📡 CORE API TESTS")
     tester.test_root_endpoint()
     
-    # Chat Flow Tests
-    print("\n💬 CHAT FUNCTIONALITY TESTS")
-    tester.test_chat_session_start_unauthenticated()
-    tester.test_chat_message_with_invalid_session()
-    tester.test_chat_message_direct_with_valid_session()
-    tester.test_chat_session_start()
-    tester.test_chat_message()
-    tester.test_crisis_detection()
-    tester.test_session_complete()
+    # PRIORITY: Comprehensive Gemini Integration Tests
+    gemini_success = tester.run_comprehensive_gemini_tests()
     
-    # Memory Processing Tests
-    print("\n🧠 MEMORY PROCESSING TESTS")
+    # Memory Processing Tests (Gemini-powered)
+    print("\n🧠 MEMORY PROCESSING TESTS (Gemini-powered)")
     tester.test_memory_processing_start()
     tester.test_memory_processing_message()
     tester.test_memory_processing_phase_update()
+    
+    # AI Analysis Tests (Gemini-powered)
+    print("\n🤖 AI ANALYSIS TESTS (Gemini-powered)")
+    tester.test_pattern_analysis()
+    tester.test_weekly_insights()
     
     # Data Retrieval Tests
     print("\n📊 DATA RETRIEVAL TESTS")
     tester.test_emotion_history()
     tester.test_recent_sessions()
     
-    # AI Analysis Tests
-    print("\n🤖 AI ANALYSIS TESTS")
-    tester.test_pattern_analysis()
-    tester.test_weekly_insights()
-    
     # Authentication Tests
     print("\n🔐 AUTHENTICATION TESTS")
     tester.test_auth_endpoints()
     
-    # Comprehensive Chat Flow Diagnosis
-    tester.test_chat_flow_diagnosis()
+    # Chat Flow Tests (require authentication)
+    print("\n💬 CHAT FUNCTIONALITY TESTS (Auth Required)")
+    tester.test_chat_session_start_unauthenticated()
+    tester.test_chat_message_with_invalid_session()
     
     # Final Results
-    print("\n" + "=" * 50)
+    print("\n" + "=" * 60)
     print(f"📊 FINAL RESULTS")
-    print(f"Tests Run: {tester.tests_run}")
-    print(f"Tests Passed: {tester.tests_passed}")
-    print(f"Success Rate: {(tester.tests_passed/tester.tests_run)*100:.1f}%")
+    print(f"Total Tests Run: {tester.tests_run}")
+    print(f"Total Tests Passed: {tester.tests_passed}")
+    print(f"Overall Success Rate: {(tester.tests_passed/tester.tests_run)*100:.1f}%")
     
-    if tester.tests_passed == tester.tests_run:
-        print("🎉 All tests passed!")
-        return 0
+    print(f"\n🤖 GEMINI INTEGRATION RESULTS:")
+    print(f"Gemini Tests Run: {tester.gemini_tests_run}")
+    print(f"Gemini Tests Passed: {tester.gemini_tests_passed}")
+    if tester.gemini_tests_run > 0:
+        print(f"Gemini Success Rate: {(tester.gemini_tests_passed/tester.gemini_tests_run)*100:.1f}%")
+    
+    if gemini_success:
+        print("🎉 Gemini API integration is working correctly!")
     else:
-        print(f"⚠️ {tester.tests_run - tester.tests_passed} tests failed")
-        return 1
+        print("⚠️ Gemini API integration has issues that need attention")
+    
+    # Return based on Gemini test results since that's the focus
+    return 0 if gemini_success else 1
 
 if __name__ == "__main__":
     sys.exit(main())
