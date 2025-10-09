@@ -850,12 +850,12 @@ async def start_memory_processing(request: StartMemoryProcessingRequest):
         await db.memory_processing.insert_one(processing_session.dict())
         
         # Initialize Memory Processing Guide chat
-        api_key = os.environ.get('EMERGENT_LLM_KEY')
+        api_key = os.environ.get('GEMINI_API_KEY')
         chat = LlmChat(
             api_key=api_key,
             session_id=processing_session.id,
             system_message=MEMORY_PROCESSING_GUIDE_PROMPT
-        ).with_model("anthropic", "claude-4-sonnet-20250514")
+        ).with_model("gemini", "gemini-2.0-flash")
         
         # Get opening message
         opening_prompt = f"User has mentioned '{request.memory_topic}' multiple times and it's weighing on them. Start the memory processing flow with the opening sequence."
