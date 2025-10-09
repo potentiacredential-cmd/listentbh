@@ -1109,12 +1109,12 @@ async def generate_weekly_insight(user_id: str = "default_user"):
                 session_summaries.append(f"{session.date}: {session.summary}")
         
         # Create insight using Insight Synthesizer
-        api_key = os.environ.get('EMERGENT_LLM_KEY')
+        api_key = os.environ.get('GEMINI_API_KEY')
         chat = LlmChat(
             api_key=api_key,
             session_id=f"weekly_insight_{user_id}",
             system_message=INSIGHT_SYNTHESIZER_PROMPT
-        ).with_model("anthropic", "claude-4-sonnet-20250514")
+        ).with_model("gemini", "gemini-2.0-flash")
         
         insight_prompt = f"""Create a weekly insight report for this user.
 
