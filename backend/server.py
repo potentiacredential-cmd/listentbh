@@ -720,12 +720,12 @@ async def send_message(request: ChatRequest):
         session.messages.append(user_msg)
         
         # Initialize LLM chat with conversation history
-        api_key = os.environ.get('EMERGENT_LLM_KEY')
+        api_key = os.environ.get('GEMINI_API_KEY')
         chat = LlmChat(
             api_key=api_key,
             session_id=request.session_id,
             system_message=EMOTIONAL_LISTENER_PROMPT
-        ).with_model("anthropic", "claude-4-sonnet-20250514")
+        ).with_model("gemini", "gemini-2.0-flash")
         
         # Build message history for context
         # Note: emergentintegrations manages its own history per session_id
