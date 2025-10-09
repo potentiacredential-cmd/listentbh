@@ -1041,12 +1041,12 @@ async def analyze_patterns(user_id: str = "default_user"):
                     all_text += msg.content + " "
         
         # Use Pattern Analyzer to identify patterns
-        api_key = os.environ.get('EMERGENT_LLM_KEY')
+        api_key = os.environ.get('GEMINI_API_KEY')
         chat = LlmChat(
             api_key=api_key,
             session_id=f"pattern_analysis_{user_id}",
             system_message=PATTERN_ANALYZER_PROMPT
-        ).with_model("anthropic", "claude-4-sonnet-20250514")
+        ).with_model("gemini", "gemini-2.0-flash")
         
         analysis_prompt = f"Analyze these user conversations for patterns, rumination, and emotional weight:\n\n{all_text}"
         user_message = UserMessage(text=analysis_prompt)
