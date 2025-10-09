@@ -903,12 +903,12 @@ async def send_memory_processing_message(request: MemoryProcessingMessageRequest
         processing_session.messages.append(user_msg)
         
         # Get response from Memory Processing Guide
-        api_key = os.environ.get('EMERGENT_LLM_KEY')
+        api_key = os.environ.get('GEMINI_API_KEY')
         chat = LlmChat(
             api_key=api_key,
             session_id=request.session_id,
             system_message=MEMORY_PROCESSING_GUIDE_PROMPT
-        ).with_model("anthropic", "claude-4-sonnet-20250514")
+        ).with_model("gemini", "gemini-2.0-flash")
         
         user_message = UserMessage(text=request.message)
         response_text = await chat.send_message(user_message)
