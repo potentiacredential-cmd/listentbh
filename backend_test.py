@@ -15,6 +15,8 @@ class ListentbhAPITester:
         self.tests_passed = 0
         self.session_id = None
         self.memory_session_id = None
+        self.gemini_tests_passed = 0
+        self.gemini_tests_run = 0
 
     def run_test(self, name, method, endpoint, expected_status, data=None, headers=None):
         """Run a single API test"""
